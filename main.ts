@@ -9,7 +9,6 @@ import {
   existsSync,
   mkdirSync,
   readdirSync,
-  rmSync,
   statSync,
   writeFileSync,
 } from "node:fs";
@@ -51,7 +50,10 @@ for (const shot of shots) {
   if (!/\.(png|jpe?g)$/i.test(shot)) fail(`screenshots/${shot} is not a PNG or JPEG`);
 }
 
-rmSync(OUT_DIR, { recursive: true, force: true });
+// NOTE: never delete OUT_DIR itself. In the grader /output is a mount
+// point provided fresh and empty; removing it fails the run (the round-1
+// rejection: run_completes / HTTP 422 "Run did not complete"). The
+// recursive mkdirs below create OUT_DIR and the subdirs when missing.
 mkdirSync(join(OUT_DIR, "game"), { recursive: true });
 mkdirSync(join(OUT_DIR, "screenshots"), { recursive: true });
 cpSync(gameDir, join(OUT_DIR, "game"), { recursive: true });
